@@ -53,7 +53,7 @@ def generate_launch_description():
             description='Use simulation (Gazebo) clock if true'),
 
         IncludeLaunchDescription(
-            PythonLaunchDescriptionSource([my_launch_file_dir, '/my_robot_localiztion.py']),
+            PythonLaunchDescriptionSource([my_launch_file_dir, '/my_robot_localization.py']),
             launch_arguments={
                 'map': map_dir,
                 'use_sim_time': use_sim_time,
