@@ -26,6 +26,7 @@ endif()
 add_executable(my_own_controller src/test.cpp)
 add_executable(draw_circle src/draw_circle.cpp)
 add_executable(draw_square src/draw_square.cpp)
+add_executable(pose_sub src/pose_sub.cpp)
 
 # Link dependencies
 target_link_libraries(my_own_controller
@@ -36,6 +37,10 @@ target_link_libraries(draw_circle
   ${geometry_msgs_LIBRARIES}
 )
 target_link_libraries(draw_square
+  ${rclcpp_LIBRARIES}
+  ${geometry_msgs_LIBRARIES}
+)
+target_link_libraries(pose_sub
   ${rclcpp_LIBRARIES}
   ${geometry_msgs_LIBRARIES}
 )
@@ -54,6 +59,11 @@ install(TARGETS
   DESTINATION lib/${PROJECT_NAME}
 )
 
+install(TARGETS
+  pose_sub
+  DESTINATION lib/${PROJECT_NAME}
+)
+
 # Export dependencies
 ament_target_dependencies(my_own_controller
   rclcpp
@@ -63,6 +73,11 @@ ament_target_dependencies(draw_circle
   geometry_msgs
 )
 ament_target_dependencies(draw_square
+  rclcpp
+  geometry_msgs
+)
+
+ament_target_dependencies(pose_sub
   rclcpp
   geometry_msgs
 )

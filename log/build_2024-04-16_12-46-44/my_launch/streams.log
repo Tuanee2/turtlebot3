@@ -1,0 +1,34 @@
+[0.005s] Invoking command in '/home/parallels/ros2_ws/src/build/my_launch': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/parallels/ros2_ws/install/my_robot_controller:/opt/ros/humble /usr/bin/cmake --build /home/parallels/ros2_ws/src/build/my_launch -- -j5 -l5
+[0.026s] Invoked command in '/home/parallels/ros2_ws/src/build/my_launch' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/parallels/ros2_ws/install/my_robot_controller:/opt/ros/humble /usr/bin/cmake --build /home/parallels/ros2_ws/src/build/my_launch -- -j5 -l5
+[0.039s] Invoking command in '/home/parallels/ros2_ws/src/build/my_launch': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/parallels/ros2_ws/install/my_robot_controller:/opt/ros/humble /usr/bin/cmake --install /home/parallels/ros2_ws/src/build/my_launch
+[0.042s] -- Install configuration: ""
+[0.042s] -- Up-to-date: /home/parallels/ros2_ws/src/install/my_launch/share/my_launch//launch
+[0.042s] -- Up-to-date: /home/parallels/ros2_ws/src/install/my_launch/share/my_launch//launch/localization_launch.py
+[0.042s] -- Installing: /home/parallels/ros2_ws/src/install/my_launch/share/my_launch//launch/bringup_launch.py
+[0.042s] -- Installing: /home/parallels/ros2_ws/src/install/my_launch/share/my_launch//launch/my_localization.launch.py
+[0.042s] -- Up-to-date: /home/parallels/ros2_ws/src/install/my_launch/share/my_launch//launch/slam_launch.py
+[0.042s] -- Up-to-date: /home/parallels/ros2_ws/src/install/my_launch/share/my_launch//params
+[0.043s] -- Up-to-date: /home/parallels/ros2_ws/src/install/my_launch/share/my_launch//params/map_server.yaml
+[0.043s] -- Up-to-date: /home/parallels/ros2_ws/src/install/my_launch/share/my_launch//params/amcl.yaml
+[0.043s] -- Up-to-date: /home/parallels/ros2_ws/src/install/my_launch/share/my_launch//params/my_robot.yaml
+[0.043s] -- Up-to-date: /home/parallels/ros2_ws/src/install/my_launch/share/my_launch//map
+[0.043s] -- Up-to-date: /home/parallels/ros2_ws/src/install/my_launch/share/my_launch//map/map.yaml
+[0.043s] -- Up-to-date: /home/parallels/ros2_ws/src/install/my_launch/share/my_launch//map/map.pgm
+[0.043s] -- Up-to-date: /home/parallels/ros2_ws/src/install/my_launch/share/my_launch//rviz
+[0.043s] -- Up-to-date: /home/parallels/ros2_ws/src/install/my_launch/share/my_launch//rviz/tb3_navigation2.rviz
+[0.043s] -- Up-to-date: /home/parallels/ros2_ws/src/install/my_launch/share/ament_index/resource_index/package_run_dependencies/my_launch
+[0.043s] -- Up-to-date: /home/parallels/ros2_ws/src/install/my_launch/share/ament_index/resource_index/parent_prefix_path/my_launch
+[0.043s] -- Up-to-date: /home/parallels/ros2_ws/src/install/my_launch/share/my_launch/environment/ament_prefix_path.sh
+[0.043s] -- Up-to-date: /home/parallels/ros2_ws/src/install/my_launch/share/my_launch/environment/ament_prefix_path.dsv
+[0.043s] -- Up-to-date: /home/parallels/ros2_ws/src/install/my_launch/share/my_launch/environment/path.sh
+[0.043s] -- Up-to-date: /home/parallels/ros2_ws/src/install/my_launch/share/my_launch/environment/path.dsv
+[0.043s] -- Up-to-date: /home/parallels/ros2_ws/src/install/my_launch/share/my_launch/local_setup.bash
+[0.043s] -- Up-to-date: /home/parallels/ros2_ws/src/install/my_launch/share/my_launch/local_setup.sh
+[0.043s] -- Up-to-date: /home/parallels/ros2_ws/src/install/my_launch/share/my_launch/local_setup.zsh
+[0.043s] -- Up-to-date: /home/parallels/ros2_ws/src/install/my_launch/share/my_launch/local_setup.dsv
+[0.043s] -- Up-to-date: /home/parallels/ros2_ws/src/install/my_launch/share/my_launch/package.dsv
+[0.043s] -- Up-to-date: /home/parallels/ros2_ws/src/install/my_launch/share/ament_index/resource_index/packages/my_launch
+[0.043s] -- Up-to-date: /home/parallels/ros2_ws/src/install/my_launch/share/my_launch/cmake/my_launchConfig.cmake
+[0.043s] -- Up-to-date: /home/parallels/ros2_ws/src/install/my_launch/share/my_launch/cmake/my_launchConfig-version.cmake
+[0.043s] -- Up-to-date: /home/parallels/ros2_ws/src/install/my_launch/share/my_launch/package.xml
+[0.044s] Invoked command in '/home/parallels/ros2_ws/src/build/my_launch' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/parallels/ros2_ws/install/my_robot_controller:/opt/ros/humble /usr/bin/cmake --install /home/parallels/ros2_ws/src/build/my_launch
