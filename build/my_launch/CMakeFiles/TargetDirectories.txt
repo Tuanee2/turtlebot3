@@ -1,9 +1,0 @@
-/home/parallels/ros2_ws/src/build/my_launch/CMakeFiles/uninstall.dir
-/home/parallels/ros2_ws/src/build/my_launch/CMakeFiles/my_launch_uninstall.dir
-/home/parallels/ros2_ws/src/build/my_launch/CMakeFiles/test.dir
-/home/parallels/ros2_ws/src/build/my_launch/CMakeFiles/edit_cache.dir
-/home/parallels/ros2_ws/src/build/my_launch/CMakeFiles/rebuild_cache.dir
-/home/parallels/ros2_ws/src/build/my_launch/CMakeFiles/list_install_components.dir
-/home/parallels/ros2_ws/src/build/my_launch/CMakeFiles/install.dir
-/home/parallels/ros2_ws/src/build/my_launch/CMakeFiles/install/local.dir
-/home/parallels/ros2_ws/src/build/my_launch/CMakeFiles/install/strip.dir
