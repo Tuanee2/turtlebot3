@@ -13,69 +13,76 @@ find_package(nav2_map_server REQUIRED)
 find_package(nav2_amcl REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(nav_msgs REQUIRED)
+find_package(rviz_common REQUIRED)
+find_package(rviz_rendering REQUIRED)
+find_package(rviz_default_plugins REQUIRED)
+find_package(OGRE REQUIRED)
 
-if(BUILD_TESTING)
-  find_package(ament_lint_auto REQUIRED)
-  # the following line skips the linter which checks for copyrights
-  # comment the line when a copyright and license is added to all source files
-  set(ament_cmake_copyright_FOUND TRUE)
-  # the following line skips cpplint (only works in a git repo)
-  # comment the line when this package is in a git repo and when
-  # a copyright and license is added to all source files
-  set(ament_cmake_cpplint_FOUND TRUE)
-  ament_lint_auto_find_test_dependencies()
-endif()
-
-# Install launch files
-install(DIRECTORY
-  launch
-  DESTINATION share/${PROJECT_NAME}/
+# ... your other package dependencies ...
+set(CMAKE_AUTOMOC ON)
+# Create the plugin's library
+set(rviz_plugin_sources
+  ${CMAKE_CURRENT_SOURCE_DIR}/rviz_plugin/src/myCustomDisplay.cpp
+)
+set(rviz_plugin_headers
+  ${CMAKE_CURRENT_SOURCE_DIR}/rviz_plugin/include/myCustomDisplay.hpp
+)
+add_library(${PROJECT_NAME}_plugin SHARED
+  ${rviz_plugin_sources}
+  ${rviz_plugin_headers}
+)
+ament_target_dependencies(${PROJECT_NAME}_plugin
+  rclcpp
+  rviz_common
+  rviz_rendering
+  rviz_default_plugins
+  geometry_msgs
+)
+target_include_directories(${PROJECT_NAME}_plugin PUBLIC
+  ${CMAKE_CURRENT_SOURCE_DIR}/rviz_plugin/include
+)
+target_link_libraries(${PROJECT_NAME}_plugin
+  ${OGRE_LIBRARIES}
+  rviz_common::rviz_common
 )
 
-# Install param files
-install(DIRECTORY
-  params
-  DESTINATION share/${PROJECT_NAME}/
+# Export plugin description
+pluginlib_export_plugin_description_file(rviz_common plugin_description.xml)
+
+# Install the plugin's library
+install(TARGETS ${PROJECT_NAME}_plugin
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin
+)
+# Install the plugin's header files
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/rviz_plugin/include/
+  DESTINATION include/${PROJECT_NAME}
 )
 
-# Install map files
-install(DIRECTORY
-  map
-  DESTINATION share/${PROJECT_NAME}/
-)
+# Install launch, param, map, and rviz files as before
 
-# Install rviz files
-install(DIRECTORY
-  rviz
-  DESTINATION share/${PROJECT_NAME}/
-)
-
+# Install executables
 add_executable(init_pos_pub src/init_pos_pub.cpp)
 add_executable(create_path src/create_path.cpp)
-
-# Specify libraries to link a library or executable target against
-ament_target_dependencies(init_pos_pub
-  rclcpp
-  geometry_msgs
-)
-
-ament_target_dependencies(create_path
-  rclcpp
-  geometry_msgs
-  nav_msgs
-)
-
-# Install the executable
+add_executable(robotController src/robotController.cpp)
+ament_target_dependencies(init_pos_pub rclcpp geometry_msgs)
+ament_target_dependencies(create_path rclcpp geometry_msgs nav_msgs)
+ament_target_dependencies(robotController rclcpp geometry_msgs nav_msgs)
 install(TARGETS
-init_pos_pub
+  init_pos_pub
+  create_path
+  robotController
   DESTINATION lib/${PROJECT_NAME}
 )
 
-install(TARGETS
-create_path
-  DESTINATION lib/${PROJECT_NAME}
+# If you have any tests, they would go here
+
+# Install other directories (launch, params, map, rviz)
+install(DIRECTORY
+  launch params map rviz
+  DESTINATION share/${PROJECT_NAME}
 )
 
-
-
+# Finally call ament_package to finish setting up the package
 ament_package()

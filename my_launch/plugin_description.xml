@@ -1,0 +1,7 @@
+<library path="my_launch_plugin">
+  <class name="my_launch/rviz_plugin/MyCustomDisplay" 
+         type="MyCustomDisplay" 
+         base_class_type="rviz_common::Display">
+    <description>This plugin displays a point on the map.</description>
+  </class>
+</library>
