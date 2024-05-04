@@ -36,29 +36,6 @@ public:
     RCLCPP_INFO(this->get_logger(), "Star follow the path.");
   }
 
-private:
-  void plan_callback(const nav_msgs::msg::Path::SharedPtr msg)
-  {
-    RCLCPP_INFO(this->get_logger(), "Received path with %zu poses", msg->poses.size());
-    // You might want to implement some logic based on the path here
-    plan.poses = msg->poses;
-  }
-
-  void pose_callback(const geometry_msgs::msg::PoseWithCovarianceStamped::SharedPtr msg)
-  {
-    RCLCPP_INFO(this->get_logger(), "Received pose: [%f, %f, %f]",
-                msg->pose.pose.position.x, msg->pose.pose.position.y, msg->pose.pose.position.z);
-    // Process the pose information and potentially publish to /cmd_vel
-    current_pose.pose = msg->pose;
-    //
-    auto cmd_vel = geometry_msgs::msg::Twist();
-    cmd_vel.linear.x = 0.5;  // Example: move forward with a predefined speed
-    cmd_vel.angular.z = 0.0; // Example: no rotation
-
-    publisher_->publish(cmd_vel);
-    RCLCPP_INFO(this->get_logger(), "Published cmd_vel to move forward");
-  }
-
   void controller()
   {
     size_t target_pose_index_ = 0;
@@ -102,7 +79,6 @@ private:
           cond = false;
         }
       }
-
       if(cond == false){
         if (pose_error <= 0.05 || pose_error >= -0.05)
         {
@@ -128,7 +104,25 @@ private:
         RCLCPP_INFO(this->get_logger(), "Wait a new path!");
         break;
       }
+      rclcpp::spin_some(shared_from_this());
     }
+  }
+
+
+private:
+  void plan_callback(const nav_msgs::msg::Path::SharedPtr msg)
+  {
+    RCLCPP_INFO(this->get_logger(), "Received path with %zu poses", msg->poses.size());
+    // You might want to implement some logic based on the path here
+    plan.poses = msg->poses;
+  }
+
+  void pose_callback(const geometry_msgs::msg::PoseWithCovarianceStamped::SharedPtr msg)
+  {
+    RCLCPP_INFO(this->get_logger(), "Received pose: [%f, %f, %f]",
+                msg->pose.pose.position.x, msg->pose.pose.position.y, msg->pose.pose.position.z);
+    // Process the pose information and potentially publish to /cmd_vel
+    current_pose.pose = msg->pose;
   }
 
   rclcpp::Subscription<nav_msgs::msg::Path>::SharedPtr subscription_plan_;
@@ -172,7 +166,8 @@ int main(int argc, char *argv[])
       }
     }
   }else{
-    rclcpp::spin(std::make_shared<PlanPoseToCmdVelNode>());
+    auto node = std::make_shared<PlanPoseToCmdVelNode>();
+    node->controller();
     rclcpp::shutdown();
   }
   return 0;
