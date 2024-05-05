@@ -36,41 +36,72 @@ public:
     RCLCPP_INFO(this->get_logger(), "Star follow the path.");
   }
 
-  void controller()
+  void followPath()
   {
     size_t target_pose_index_ = 0;
     geometry_msgs::msg::PoseStamped target_pose;
     target_pose.header.stamp = current_pose.header.stamp;
 
+    //chose the follow mode
+    RCLCPP_INFO(this->get_logger(), "Press 'n' to start at the nearest pose, 'f' to start at the first pose");
+    char str;
+    while(std::cin>>str){
+      if(str == 'n'){
+        target_pose_index_ = findTheShortestWay();
+        break;
+      }else if(str == 'f'){
+        break;
+      }else{
+        std::cout<<"WRONG CMD !!!"<<std::endl;
+      }
+    }
+
     while(target_pose_index_ <= plan.poses.size())
     {
       target_pose.pose = plan.poses[target_pose_index_].pose;
-      //error_yaw
-      double roll, pitch;
-      // get current_yaw
-      tf2::Quaternion q_current(
-        current_pose.pose.pose.orientation.x,
-        current_pose.pose.pose.orientation.y,
-        current_pose.pose.pose.orientation.z,
-        current_pose.pose.pose.orientation.w
-      );
-      tf2::Matrix3x3 n(q_current);
-      n.getRPY(roll, pitch, current_yaw);
-      // calculate target_yaw
-      target_yaw = atan2(target_pose.pose.position.y - current_pose.pose.pose.position.y,target_pose.pose.position.x - current_pose.pose.pose.position.x);
-      desire_yaw = target_yaw - current_yaw;
-      // limit desire_yaw
-      if (desire_yaw  > M_PI) {
-        desire_yaw  -= 2 * M_PI;
-      }else if (desire_yaw  < -M_PI) {
-        desire_yaw  += 2 * M_PI;
+      
+      controller(Kp_x,target_pose.pose.position.x,target_pose.pose.position.y);
+
+      target_pose_index_++;
+
+      if (target_pose_index_ > plan.poses.size()) 
+      {
+        RCLCPP_INFO(this->get_logger(), "Wait a new path!");
+        break;
       }
-      // P controller
+    }
+  }
+
+  double getYawFromQuaternion(const geometry_msgs::msg::Quaternion quat) {
+        
+    tf2::Quaternion q_current(quat.x,quat.y,quat.z,quat.w);
+    double roll, pitch, yaw;
+    tf2::Matrix3x3(q_current).getRPY(roll, pitch, yaw);
+    return yaw;
+  }
+
+  double normalizeAngle(double angle) {
+    if (angle > M_PI) angle -= 2 * M_PI;
+    if (angle < -M_PI) angle += 2 * M_PI;
+    return angle;
+  }
+
+  void controller(double kp,double x,double y){
+
+    while(1){
+      double goal_angle = atan2(y - current_pose.pose.pose.position.y,x - current_pose.pose.pose.position.x);
+
+      double current_angle = getYawFromQuaternion(current_pose.pose.pose.orientation);
+
+      double angle_error = normalizeAngle(goal_angle - current_angle);
+
+      geometry_msgs::msg::Twist cmd_vel;
+
       if(cond == true){
-        if (desire_yaw >= 0.01 || desire_yaw <= -0.01)
+        if (angle_error >= 0.01 || angle_error <= -0.01)
         {
           cmd_vel.linear.x = 0;
-          cmd_vel.angular.z = desire_yaw;
+          cmd_vel.angular.z = kp*angle_error;
           publisher_->publish(cmd_vel);
         }else{
           cmd_vel.linear.x = 0;
@@ -80,43 +111,81 @@ public:
         }
       }
       if(cond == false){
+        double x_err = (x - current_pose.pose.pose.position.x);
+        double y_err = (y - current_pose.pose.pose.position.y);
+        pose_error = sqrt(x_err*x_err + y_err*y_err);
         if (pose_error <= 0.05 || pose_error >= -0.05)
         {
           cmd_vel.linear.x = 0;
           cmd_vel.angular.z = 0;
           publisher_->publish(cmd_vel);
-          target_pose_index_++;
           cond = true;
         }
         else
         {
-          double x_err = (target_pose.pose.position.x - current_pose.pose.pose.position.x);
-          double y_err = (target_pose.pose.position.y - current_pose.pose.pose.position.y);
-          pose_error = sqrt(x_err*x_err + y_err*y_err);
-          cmd_vel.linear.x = Kp_x*pose_error;
+          cmd_vel.linear.x = kp*pose_error;
           cmd_vel.angular.z = desire_yaw;
           publisher_->publish(cmd_vel);
         }
-      }
-    
-      if (target_pose_index_ > plan.poses.size()) 
-      {
-        RCLCPP_INFO(this->get_logger(), "Wait a new path!");
-        break;
       }
       rclcpp::spin_some(shared_from_this());
     }
   }
 
 
+
+  size_t findTheShortestWay(){
+
+    double* distance = new double[plan.poses.size()-1];
+
+    // calculate distances
+    for(size_t i = 0;i < (plan.poses.size()-1);i++){
+      double x_err = plan.poses[i+1].pose.position.x - plan.poses[i].pose.position.x;
+      double y_err = plan.poses[i+1].pose.position.y - plan.poses[i].pose.position.y;
+      double numerator = x_err*(plan.poses[i].pose.position.y - current_pose.pose.pose.position.y) - (plan.poses[i].pose.position.x -current_pose.pose.pose.position.x)*y_err;
+      distance[i] = abs(numerator)/sqrt(x_err*x_err + y_err*y_err);
+    }
+
+    //find the shortest distance
+    size_t shortest_index = 0;
+    double shortest_distance = distance[0];
+    
+    for(size_t i = 1;i < (plan.poses.size()-1);i++){
+      if(distance[i]<=shortest_distance){
+        shortest_distance = distance[i];
+        shortest_index = i;
+      }
+    }
+
+    //find the nearest pose on the path
+    double x1 = plan.poses[shortest_index].pose.position.x;
+    double y1 = plan.poses[shortest_index].pose.position.y;
+    double x2 = plan.poses[shortest_index + 1].pose.position.x;
+    double y2 = plan.poses[shortest_index + 1].pose.position.y;
+    double dx = x2 - x1;
+    double dy = y2 - y1;
+    double t = ((current_pose.pose.pose.position.x - x1) * dx + (current_pose.pose.pose.position.y - y1) * dy) / (dx * dx + dy * dy);
+    geometry_msgs::msg::PoseWithCovarianceStamped nearest_pose;
+    nearest_pose.pose.pose.position.x = x1 + t * dx;
+    nearest_pose.pose.pose.position.y = y1 + t * dy;
+
+    //Go to the nearest pose
+    controller(3,nearest_pose.pose.pose.position.x,nearest_pose.pose.pose.position.y);
+
+    delete[] distance;
+    return shortest_index+1;
+  }
+
+
 private:
+// update path
   void plan_callback(const nav_msgs::msg::Path::SharedPtr msg)
   {
     RCLCPP_INFO(this->get_logger(), "Received path with %zu poses", msg->poses.size());
     // You might want to implement some logic based on the path here
     plan.poses = msg->poses;
   }
-
+//update position
   void pose_callback(const geometry_msgs::msg::PoseWithCovarianceStamped::SharedPtr msg)
   {
     RCLCPP_INFO(this->get_logger(), "Received pose: [%f, %f, %f]",
@@ -167,7 +236,7 @@ int main(int argc, char *argv[])
     }
   }else{
     auto node = std::make_shared<PlanPoseToCmdVelNode>();
-    node->controller();
+    node->followPath();
     rclcpp::shutdown();
   }
   return 0;
