@@ -17,6 +17,9 @@ MyCustomDisplay::MyCustomDisplay() :
     size_property_(new properties::IntProperty("Size", 10,
                                                "Size of the point.", this)),
     line_type_property_(new properties::EnumProperty("Line Type","Path","Choose between wall or path.",this)),
+
+    workspace_status_property_(new properties::EnumProperty("Workspace status","Incomplete","Choose between Incomplete or Completed.",this)),
+    
     line_typeOfShape_property_(new properties::EnumProperty("Line Type of shape", "Straight",
                                                      "Choose between a straight line or a curved line.", this)),
     line_Orientation_type_property_(new properties::EnumProperty("Orientation Type", "UpsideDown",
@@ -26,6 +29,8 @@ MyCustomDisplay::MyCustomDisplay() :
 {
     line_type_property_->addOption("Path",0);
     line_type_property_->addOption("Wall",1);
+    workspace_status_property_->addOption("Incomplete",0);
+    workspace_status_property_->addOption("Completed",1);
     line_typeOfShape_property_->addOption("Straight", 0);
     line_typeOfShape_property_->addOption("Curved", 1);
     line_Orientation_type_property_->addOption("UpsideDown", 0);
@@ -75,14 +80,21 @@ void MyCustomDisplay::processMessage(const geometry_msgs::msg::PointStamped::Con
     if(line_type_property_->getOptionInt() == 0){
         type = "Path";
         point_positions_path.push_back(Ogre::Vector3(msg->point.x, msg->point.y, 0));
+        createPoint(msg->point,type);
+        connectPoints(type);
     }else{
         type = "Wall";
-        point_positions_wall.push_back(Ogre::Vector3(msg->point.x, msg->point.y, 0));
+
+        if(workspace_status_property_->getOptionInt() == 0){
+            point_positions_wall.push_back(Ogre::Vector3(msg->point.x, msg->point.y, 0));
+            createPoint(msg->point,type);
+        }else{
+            if (!point_positions_wall.empty()) {
+                point_positions_wall.push_back(Ogre::Vector3(point_positions_wall.front().x, point_positions_wall.front().y, 0));
+            }
+        }
+        connectPoints(type);
     }
-    
-    
-    createPoint(msg->point,type);
-    connectPoints(type);
 }
 
 void MyCustomDisplay::createPoint(const geometry_msgs::msg::Point& point, const std::string& type) {

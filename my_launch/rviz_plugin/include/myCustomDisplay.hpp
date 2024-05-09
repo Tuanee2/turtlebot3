@@ -39,6 +39,7 @@ private:
   std::unique_ptr<rviz_common::properties::ColorProperty> color_property_;
   std::unique_ptr<rviz_common::properties::IntProperty> size_property_;
   std::unique_ptr<rviz_common::properties::EnumProperty> line_type_property_;
+  std::unique_ptr<rviz_common::properties::EnumProperty> workspace_status_property_;
   std::unique_ptr<rviz_common::properties::EnumProperty> line_typeOfShape_property_;
   std::unique_ptr<rviz_common::properties::EnumProperty> line_Orientation_type_property_;
   std::unique_ptr<rviz_common::properties::FloatProperty> radius_property_;
