@@ -34,6 +34,7 @@ private:
   void createPoint(const geometry_msgs::msg::Point& point,const std::string& type);
   void connectPoints(const std::string& type);
   void drawCurvedLine(Ogre::ManualObject* line, const Ogre::Vector3& start, const Ogre::Vector3& end);
+  bool checkPoint(const geometry_msgs::msg::Point& point);
   Ogre::MaterialPtr createOrGetPointMaterial(const std::string& type);
   Ogre::MaterialPtr createOrGetLineMaterial(const std::string& type);
   std::unique_ptr<rviz_common::properties::ColorProperty> color_property_;

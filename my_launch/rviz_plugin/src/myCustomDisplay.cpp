@@ -80,8 +80,17 @@ void MyCustomDisplay::processMessage(const geometry_msgs::msg::PointStamped::Con
     if(line_type_property_->getOptionInt() == 0){
         type = "Path";
         point_positions_path.push_back(Ogre::Vector3(msg->point.x, msg->point.y, 0));
-        createPoint(msg->point,type);
-        connectPoints(type);
+        if(workspace_status_property_->getOptionInt() == 0){
+            createPoint(msg->point,type);
+            connectPoints(type);
+        }else{
+            if(checkPoint(msg->point) == false){
+                std::cout<<"Wrong pose, please clicked inside the Work Area."<<std::endl;
+            }else{
+                createPoint(msg->point,type);
+                connectPoints(type);
+            }
+        }
     }else{
         type = "Wall";
 
@@ -254,6 +263,20 @@ Ogre::MaterialPtr MyCustomDisplay::createOrGetLineMaterial(const std::string& ty
     }
     material->getTechnique(0)->getPass(0)->setLineWidth(20.0f);
     return material;
+}
+
+bool MyCustomDisplay::checkPoint(const geometry_msgs::msg::Point& point){
+
+    int i, j, nvert = point_positions_wall.size();
+        bool inside = false;
+
+        for (i = 0, j = nvert - 1; i < nvert; j = i++) {
+            if (((point_positions_wall[i].y >= point.y) != (point_positions_wall[j].y >= point.y)) &&
+                (point.x <= (point_positions_wall[j].x - point_positions_wall[i].x) * (point.y - point_positions_wall[i].y) / (point_positions_wall[j].y - point_positions_wall[i].y) + point_positions_wall[i].x))
+                inside = !inside;
+        }
+
+        return inside;
 }
 
 #include <pluginlib/class_list_macros.hpp>
