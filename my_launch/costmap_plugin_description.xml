@@ -1,0 +1,7 @@
+<library path="costmap_plugin_core">
+  <class name="MyCostmapPlugin" 
+         type="MyCostmapPlugin" 
+         base_class_type="nav2_costmap_2d::Layer">
+    <description>This is a custom costmap plugin.</description>
+  </class>
+</library>
